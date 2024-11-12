@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-db
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dbfiles:/docker-entrypoint-initdb.d
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: enigma
+      POSTGRES_PASSWORD: linux123
+      POSTGRES_DB: basedb
+  administrador-ingresos-back:
+    build:
+      context: ./Administrador-ingresos-BackEnd
+    container_name: administrador-ingresos-back
+    ports:
+      - 3000:3000
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=enigma
+      - DB_PASSWORD=linux123
+      - DB_NAME=dbgestiondinero
+    depends_on:
+      - postgres
+  administrador-ingresos-front:
+    build:
+      context: ./Administrador-ingresos-FrontEnd
+    container_name: administrador-ingresos-front
+    depends_on:
+      - administrador-ingresos-back
+    ports:
+      - 80:80
